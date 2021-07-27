@@ -35,12 +35,12 @@ function loadNovalnetCcIframe()
 
            // Called in case the challenge window Overlay (for 3ds2.0) displays
           on_show_overlay:  function (result) {
-            jQuery( '#nn_iframe' ).addClass( '.overlay' );
+            jQuery( '#nn_iframe' ).addClass( 'novalnet_cc_overlay' );
           },
 
            // Called in case the Challenge window Overlay (for 3ds2.0) hided
           on_hide_overlay:  function (result) {
-            jQuery( '#nn_iframe' ).removeClass( '.overlay' );
+            jQuery( '#nn_iframe' ).removeClass( 'novalnet_cc_overlay' );
           }
         },
 
