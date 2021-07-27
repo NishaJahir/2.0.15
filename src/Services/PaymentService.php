@@ -461,6 +461,7 @@ class PaymentService
         $customerName = $this->getCustomerName($billingAddress);
         $ccFormRequestParameters = [
             'client_key'    => trim($this->config->get('Novalnet.novalnet_client_key')),
+	    'enforce_3d'    => (int)($this->config->get('Novalnet.' . strtolower((string) $paymentKey) . '_enforce') == 'true'),
             'test_mode'     => (int)($this->config->get('Novalnet.' . strtolower((string) $paymentKey) . '_test_mode') == 'true'),
             'first_name'    => !empty($billingAddress->firstName) ? $billingAddress->firstName : $customerName['firstName'],
             'last_name'     => !empty($billingAddress->lastName) ? $billingAddress->lastName : $customerName['lastName'],
