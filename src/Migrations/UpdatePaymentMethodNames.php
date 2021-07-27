@@ -86,7 +86,7 @@ class UpdatePaymentMethodNames
                                 'name'       => $name
                                ];
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
-        } elseif ($payment_data[1] == $paymentKey && !in_array ($payment_data[2], ['Novalnet Invoice', 'Novalnet Prepayment', 'Novalnet Credit/Debit Cards', 'Novalnet Direct Debit SEPA', 'Novalnet Online Bank Transfer', 'Novalnet PayPal', 'Novalnet iDEAL', 'Novalnet eps', 'Novalnet giropay', 'Novalnet Przelewy24', 'Novalnet Barzahlen/viacash']) ) {
+        } elseif ($payment_data[1] == $paymentKey && !in_array ($payment_data[2], ['Novalnet Direct Debit SEPA', 'Novalnet Credit/Debit Cards',  'Novalnet Invoice', 'Novalnet Prepayment', 'Novalnet iDEAL', 'Novalnet Online Bank Transfer', 'Novalnet giropay', 'Novalnet Przelewy24', 'Novalnet Barzahlen/viacash', 'Novalnet eps', 'Novalnet PayPal'  ]) ) {
           $paymentMethodData = ['pluginKey'  => 'plenty_novalnet',
                                 'paymentKey' => $paymentKey,
                                 'name'       => $name,
