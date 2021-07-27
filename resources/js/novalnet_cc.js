@@ -1,5 +1,3 @@
-var $ = jQuery.noConflict();
-
 $(document).ready(function () {
      loadNovalnetCcIframe();
         $('#nn_cc_form').submit( function (e) {
