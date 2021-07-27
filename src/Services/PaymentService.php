@@ -289,25 +289,12 @@ class PaymentService
         
         $billingAddressId = $basket->customerInvoiceAddressId;
         $address = $this->addressRepository->findAddressById($billingAddressId);
+	$shippingAddress = $address;
         if(!empty($basket->customerShippingAddressId)){
             $shippingAddress = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
         }
-    
-        foreach ($address->options as $option) {
-        if ($option->typeId == 12) {
-                $name = $option->value;
-        }
-        }
-        $customerName = explode(' ', $name);
-        $firstname = $customerName[0];
-        if( count( $customerName ) > 1 ) {
-            unset($customerName[0]);
-            $lastname = implode(' ', $customerName);
-        } else {
-            $lastname = $firstname;
-        }
-        $firstName = empty ($firstname) ? $lastname : $firstname;
-        $lastName = empty ($lastname) ? $firstname : $lastname;
+	    
+	$customerName = $this->getCustomerName($address);
     
         $account = pluginApp(AccountService::class);
         $customerId = $account->getAccountContactId();
@@ -320,8 +307,8 @@ class PaymentService
             'product'            => $this->paymentHelper->getNovalnetConfig('novalnet_product_id'),
             'tariff'             => $this->paymentHelper->getNovalnetConfig('novalnet_tariff_id'),
             'test_mode'          => (int)($this->config->get($testModeKey) == 'true'),
-            'first_name'         => !empty($address->firstName) ? $address->firstName : $firstName,
-            'last_name'          => !empty($address->lastName) ? $address->lastName : $lastName,
+            'first_name'         => !empty($address->firstName) ? $address->firstName : $customerName['firstName'],
+            'last_name'          => !empty($address->lastName) ? $address->lastName : $customerName['lastName'],
             'email'              => $address->email,
             'gender'             => 'u',
             'city'               => $address->town,
@@ -366,6 +353,34 @@ class PaymentService
             'data' => $paymentRequestData,
             'url'  => $url
         ];
+    }
+	
+    
+     /**
+     * Get customer name if the salutation as Person
+     *
+     * @param object $address
+     *
+     * @return array
+     */
+    public function getCustomerName($address) 
+    {
+        foreach ($address->options as $option) {
+            if ($option->typeId == 12) {
+                    $name = $option->value;
+            }
+        }
+        $customerName = explode(' ', $name);
+        $firstname = $customerName[0];
+            if( count( $customerName ) > 1 ) {
+                unset($customerName[0]);
+                $lastname = implode(' ', $customerName);
+            } else {
+                $lastname = $firstname;
+            }
+        $firstName = empty ($firstname) ? $lastname : $firstname;
+        $lastName = empty ($lastname) ? $firstname : $lastname;
+        return ['firstName' => $firstName, 'lastName' => $lastName];
     }
 
     /**
@@ -428,7 +443,66 @@ class PaymentService
         return $url;
     }
 
+    /**
+     * Collecting the Credit Card for the initial authentication call to PSP
+     *
+     * @param object $basket
+     * @param string $paymentKey
+     * 
+     * @return string
+     */
+    public function getCreditCardAuthenticationCallData(Basket $basket, $paymentKey) {
+        $billingAddressId = $basket->customerInvoiceAddressId;
+        $billingAddress = $this->addressRepository->findAddressById($billingAddressId);
+	$shippingAddress = $billingAddress;
+        if(!empty($basket->customerShippingAddressId)){
+            $shippingAddress = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
+        }
+        $customerName = $this->getCustomerName($billingAddress);
+        $ccFormRequestParameters = [
+            'client_key'    => trim($this->config->get('Novalnet.novalnet_client_key')),
+            'test_mode'     => (int)($this->config->get('Novalnet.' . strtolower((string) $paymentKey) . '_test_mode') == 'true'),
+            'first_name'    => !empty($billingAddress->firstName) ? $billingAddress->firstName : $customerName['firstName'],
+            'last_name'     => !empty($billingAddress->lastName) ? $billingAddress->lastName : $customerName['lastName'],
+            'email'         => $billingAddress->email,
+            'street'        => $billingAddress->street,
+            'house_no'      => $billingAddress->houseNumber,
+            'city'          => $billingAddress->town,
+            'zip'           => $billingAddress->postalCode,
+            'country_code'  => $this->countryRepository->findIsoCode($billingAddress->countryId, 'iso_code_2'),
+            'amount'        => $this->paymentHelper->convertAmountToSmallerUnit($basket->basketAmount),
+            'currency'      => $basket->currency,
+            'lang'          => strtoupper($this->sessionStorage->getLocaleSettings()->language)
+        ];  
+        $billingShippingDetails = $this->getBillingShippingDetails($billingAddress, $shippingAddress);
+        if ($billingShippingDetails['billing'] == $billingShippingDetails['shipping']) {
+            $ccFormRequestParameters['same_as_billing'] = 1;
+        }
+        return json_encode($ccFormRequestParameters);
+    }
     
+    /**
+     * Retrieves Credit Card form style set in payment configuration and texts present in language files
+     *
+     * @return string
+     */
+    public function getCcFormFields() 
+    {
+        $ccformFields = [];
+
+        $styleConfiguration = array('novalnet_cc_standard_style_label', 'novalnet_cc_standard_style_field', 'novalnet_cc_standard_style_css');
+
+        foreach ($styleConfiguration as $value) {
+            $ccformFields[$value] = trim($this->config->get('Novalnet.' . $value));
+        }
+
+        $textFields = array( 'novalnet_cc_holder_Label', 'novalnet_cc_holder_input', 'novalnet_cc_number_label', 'novalnet_cc_number_input', 'novalnet_cc_expirydate_label', 'novalnet_cc_expirydate_input', 'novalnet_cc_cvc_label', 'novalnet_cc_cvc_input', 'novalnet_cc_error' );
+
+        foreach ($textFields as $value) {
+            $ccformFields[$value] = utf8_encode($this->paymentHelper->getTranslatedText($value));
+        }
+        return json_encode($ccformFields);
+    }
     
     /**
      * Check if the payment is redirection or not
