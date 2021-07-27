@@ -541,7 +541,7 @@ class PaymentService
      * @param string $paymentKey
      */
     public function isRedirectPayment($paymentKey) {
-        return (bool) (in_array($paymentKey, $this->redirectPayment) || ($paymentKey == 'NOVALNET_CC' && ($this->config->get('Novalnet.novalnet_cc_enforce') == 'true' )));
+        return (bool) (in_array($paymentKey, $this->redirectPayment) );
     }
 
     /**
