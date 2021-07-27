@@ -21,8 +21,8 @@
   "javaScriptFiles": [],
   "containers": [],
   "require": {
-    "IO": "<=5.0.33",
-    "Ceres":"<=5.0.33"
+    "IO": ">= 4.0.0",
+    "Ceres":">= 4.0.0"
     },
   "serviceProvider": "Novalnet\\Providers\\NovalnetServiceProvider",
   "runOnBuild": [
