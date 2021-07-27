@@ -1,7 +1,7 @@
-$(document).ready(function () {
+jQuery(document).ready(function () {
      loadNovalnetCcIframe();
-        $('#nn_cc_form').submit( function (e) {
-                if($('#nn_pan_hash').val().trim() == '') {
+        jQuery('#nn_cc_form').submit( function (e) {
+                if(jQuery('#nn_pan_hash').val().trim() == '') {
                     NovalnetUtility.getPanHash();
                     e.preventDefault();
                     e.stopImmediatePropagation();
@@ -11,8 +11,8 @@ $(document).ready(function () {
 
 function loadNovalnetCcIframe()
 {
-     var ccCustomFields = $('#nn_cc_formfields').val() != '' ? JSON.parse($('#nn_cc_formfields').val()) : null;
-     var ccFormDetails= $('#nn_cc_formdetails').val() != '' ? JSON.parse($('#nn_cc_formdetails').val()) : null;
+     var ccCustomFields = jQuery('#nn_cc_formfields').val() != '' ? JSON.parse(jQuery('#nn_cc_formfields').val()) : null;
+     var ccFormDetails= jQuery('#nn_cc_formdetails').val() != '' ? JSON.parse(jQuery('#nn_cc_formdetails').val()) : null;
     
     // Set your Client key
     NovalnetUtility.setClientKey((ccFormDetails.client_key !== undefined) ? ccFormDetails.client_key : '');
@@ -20,9 +20,9 @@ function loadNovalnetCcIframe()
      var requestData = {
         'callback': {
           on_success: function (result) {
-            $('#nn_pan_hash').val(result['hash']);
-            $('#nn_unique_id').val(result['unique_id']);
-            $('#nn_cc3d_redirect').val(result['do_redirect']);
+            jQuery('#nn_pan_hash').val(result['hash']);
+            jQuery('#nn_unique_id').val(result['unique_id']);
+            jQuery('#nn_cc3d_redirect').val(result['do_redirect']);
             jQuery('#nn_cc_form').submit();
             return true;
           },
@@ -35,12 +35,12 @@ function loadNovalnetCcIframe()
 
            // Called in case the challenge window Overlay (for 3ds2.0) displays
           on_show_overlay:  function (result) {
-            $( '#nn_iframe' ).addClass( '.overlay' );
+            jQuery( '#nn_iframe' ).addClass( '.overlay' );
           },
 
            // Called in case the Challenge window Overlay (for 3ds2.0) hided
           on_hide_overlay:  function (result) {
-            $( '#nn_iframe' ).removeClass( '.overlay' );
+            jQuery( '#nn_iframe' ).removeClass( '.overlay' );
           }
         },
 
