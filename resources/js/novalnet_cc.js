@@ -107,6 +107,7 @@ function loadNovalnetCcIframe()
           amount: (ccFormDetails.amount !== undefined) ? ccFormDetails.amount : '',
           currency: (ccFormDetails.currency !== undefined) ? ccFormDetails.currency : '',
           test_mode: (ccFormDetails.test_mode !== undefined) ? ccFormDetails.test_mode : '0',
+          enforce_3d: (ccFormDetails.enforce_3d !== undefined) ? ccFormDetails.enforce_3d : '0',
         }
       };
 
