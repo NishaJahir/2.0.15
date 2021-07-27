@@ -418,7 +418,11 @@ class PaymentService
                     }
         }
         } else if($paymentKey == 'NOVALNET_PREPAYMENT') {
-        $paymentRequestData['invoice_type'] = 'PREPAYMENT';
+        	$paymentRequestData['invoice_type'] = 'PREPAYMENT';
+		$prepaymentDueDate = $this->paymentHelper->getNovalnetConfig('novalnet_prepayment_due_date');
+	        if(is_numeric($prepaymentDueDate)) {
+		$paymentRequestData['due_date'] = $this->paymentHelper->dateFormatter($prepaymentDueDate);
+	       }
         } else if($paymentKey == 'NOVALNET_CASHPAYMENT') {
         $cashpaymentDueDate = $this->paymentHelper->getNovalnetConfig('novalnet_cashpayment_due_date');
         if(is_numeric($cashpaymentDueDate)) {
