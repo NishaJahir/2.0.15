@@ -1,87 +1,116 @@
 var $ = jQuery.noConflict();
-var nnButton, nnIfrmButton, iframeWindow, targetOrigin;
-nnButton = nnIfrmButton = iframeWindow = targetOrigin = false;
 
-function initIframe()
-{
-    var request = {
-        callBack: 'createElements',
-        customStyle: {
-            labelStyle: $('#nn_cc_standard_style_label').val(),
-            inputStyle: $('#nn_cc_standard_style_input').val(),
-            styleText: $('#nn_cc_standard_style_css').val(),
-            }
-    };
-
-    var iframe = $('#nn_iframe')[0];
-    iframeWindow = iframe.contentWindow ? iframe.contentWindow : iframe.contentDocument.defaultView;
-    targetOrigin = 'https://secure.novalnet.de';
-    iframeWindow.postMessage(JSON.stringify(request), targetOrigin);
-}
-
-function getHash(e)
-{   
-    $('#novalnet_form_btn').attr('disabled',true);
-    
-    if($('#nn_pan_hash').val().trim() == '') {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        iframeWindow.postMessage(
-            JSON.stringify(
-                {
-                'callBack': 'getHash',
+$(document).ready(function () {
+     loadNovalnetCcIframe();
+        $('#nn_cc_form').submit( function (e) {
+                if($('#nn_pan_hash').val().trim() == '') {
+                    NovalnetUtility.getPanHash();
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
                 }
-            ), targetOrigin
-        );
-    } else {
-        return true;
-    }
-}
+         });    
+});
 
-function reSize()
+function loadNovalnetCcIframe()
 {
-    if ($('#nn_iframe').length > 0) {
-        var iframe = $('#nn_iframe')[0];
-        iframeWindow = iframe.contentWindow ? iframe.contentWindow : iframe.contentDocument.defaultView;
-        targetOrigin = 'https://secure.novalnet.de/';
-        iframeWindow.postMessage(JSON.stringify({'callBack' : 'getHeight'}), targetOrigin);
-    }
-}
+     var ccCustomFields = $('#nn_cc_formfields').val() != '' ? JSON.parse($('#nn_cc_formfields').val()) : null;
+     var ccFormDetails= $('#nn_cc_formdetails').val() != '' ? JSON.parse($('#nn_cc_formdetails').val()) : null;
+    
+    // Set your Client key
+    NovalnetUtility.setClientKey((ccFormDetails.client_key !== undefined) ? ccFormDetails.client_key : '');
 
-function novalnetCcIframe()
-{
-    $('#cc_loading').hide();
-}
-
-window.addEventListener(
-    'message', function (e) {
-    var data = (typeof e.data === 'string') ? eval('(' + e.data + ')') : e.data;
-        
-    if (e.origin === 'https://secure.novalnet.de') {
-        if (data['callBack'] == 'getHash') {
-            if (data['error_message'] != undefined) {
-                $('#novalnet_form_btn').attr('disabled',false); 
-                alert($('<textarea />').html(data['error_message']).text());
-            } else {
-        $('#nn_pan_hash').val(data['hash']);
-                $('#nn_unique_id').val(data['unique_id']);
-                $('#nn_cc_form').submit();
+     var requestData = {
+        'callback': {
+          on_success: function (result) {
+            $('#nn_pan_hash').val(result['hash']);
+            $('#nn_unique_id').val(result['unique_id']);
+            $('#nn_cc3d_redirect').val(result['do_redirect']);
+            jQuery('#nn_cc_form').submit();
+            return true;
+          },
+          on_error: function (result) {
+           if ( undefined !== result['error_message'] ) {
+              alert(result['error_message']);
+              return false;
             }
-        }
+          },
 
-        if (data['callBack'] == 'getHeight') {
-            $('#nn_iframe').attr('height', data['contentHeight']);
-        }
-    }
-    }, false
-);
+           // Called in case the challenge window Overlay (for 3ds2.0) displays
+          on_show_overlay:  function (result) {
+            $( '#nn_iframe' ).addClass( '.overlay' );
+          },
 
-$(document).ready(
-    function () {
-    $(window).resize(
-        function() {
-        reSize();
+           // Called in case the Challenge window Overlay (for 3ds2.0) hided
+          on_hide_overlay:  function (result) {
+            $( '#nn_iframe' ).removeClass( '.overlay' );
+          }
+        },
+
+         // You can customize your Iframe container style, text etc.
+        'iframe': {
+
+         // Passed the Iframe Id
+          id: "nn_iframe",
+
+          // Display the normal cc form
+          inline: '0',
+         
+          // Adjust the creditcard style and text 
+          style: {
+            container: (ccCustomFields.novalnet_cc_standard_style_css !== undefined) ? ccCustomFields.novalnet_cc_standard_style_css : '',
+            input: (ccCustomFields.novalnet_cc_standard_style_field !== undefined) ? ccCustomFields.novalnet_cc_standard_style_field : '' ,
+            label: (ccCustomFields.novalnet_cc_standard_style_label !== undefined) ? ccCustomFields.novalnet_cc_standard_style_label : '' ,
+          },
+          
+          text: {
+            lang : (ccFormDetails.lang !== undefined) ? ccFormDetails.lang : 'en',
+            error: (ccCustomFields.credit_card_error !== undefined) ? ccCustomFields.credit_card_error : '',
+            card_holder : {
+              label: (ccCustomFields.novalnet_cc_holder_Label !== undefined) ? ccCustomFields.novalnet_cc_holder_Label : '',
+              place_holder: (ccCustomFields.novalnet_cc_holder_input !== undefined) ? ccCustomFields.novalnet_cc_holder_input : '',
+              error: (ccCustomFields.novalnet_cc_error !== undefined) ? ccCustomFields.novalnet_cc_error : ''
+            },
+            card_number : {
+              label: (ccCustomFields.novalnet_cc_number_label !== undefined) ? ccCustomFields.novalnet_cc_number_label : '',
+              place_holder: (ccCustomFields.novalnet_cc_number_input !== undefined) ? ccCustomFields.novalnet_cc_number_input : '',
+              error: (ccCustomFields.novalnet_cc_error !== undefined) ? ccCustomFields.novalnet_cc_error : ''
+            },
+            expiry_date : {
+              label: (ccCustomFields.novalnet_cc_expirydate_label !== undefined) ? ccCustomFields.novalnet_cc_expirydate_label : '',
+              place_holder: (ccCustomFields.novalnet_cc_expirydate_input !== undefined) ? ccCustomFields.novalnet_cc_expirydate_input : '',
+              error: (ccCustomFields.novalnet_cc_error !== undefined) ? ccCustomFields.novalnet_cc_error : ''
+            },
+            cvc : {
+              label: (ccCustomFields.novalnet_cc_cvc_label !== undefined) ? ccCustomFields.novalnet_cc_cvc_label : '',
+              place_holder: (ccCustomFields.novalnet_cc_cvc_input !== undefined) ? ccCustomFields.novalnet_cc_cvc_input : '',
+              error: (ccCustomFields.novalnet_cc_error !== undefined) ? ccCustomFields.novalnet_cc_error : ''
+            }
+          }
+        },
+
+         // Add Customer data
+        customer: {
+          first_name: (ccFormDetails.first_name !== undefined) ? ccFormDetails.first_name : '',
+          last_name: (ccFormDetails.last_name !== undefined) ? ccFormDetails.last_name : ccFormDetails.first_name,
+          email: (ccFormDetails.email !== undefined) ? ccFormDetails.email : '',
+          billing: {
+            street: (ccFormDetails.street !== undefined) ? ccFormDetails.street : '',
+            city: (ccFormDetails.city !== undefined) ? ccFormDetails.city : '',
+            zip: (ccFormDetails.zip !== undefined) ? ccFormDetails.zip : '',
+            country_code: (ccFormDetails.country_code !== undefined) ? ccFormDetails.country_code : ''
+          },
+          shipping: {
+            same_as_billing: (ccFormDetails.same_as_billing !== undefined) ? ccFormDetails.same_as_billing : 0,
+          },
+        },
+        
+         // Add transaction data
+        transaction: {
+          amount: (ccFormDetails.amount !== undefined) ? ccFormDetails.amount : '',
+          currency: (ccFormDetails.currency !== undefined) ? ccFormDetails.currency : '',
+          test_mode: (ccFormDetails.test_mode !== undefined) ? ccFormDetails.test_mode : '0',
         }
-    );
-    }
-);
+      };
+
+      NovalnetUtility.createCreditCardForm(requestData);
+}
