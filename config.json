@@ -49,6 +49,15 @@
                   "defaultValue":""
                }
             },
+            "novalnet_client_key":{
+               "type":"inputText",
+               "required":false,
+               "label":"Config.clientKeyLabel",
+               "options":{
+                  "tooltip":"Config.clientKeyTooltip",
+                  "defaultValue":""
+               }
+            },
             "novalnet_onhold_confirmation_status":{  
                "type":"inputText",
                "required":false,
