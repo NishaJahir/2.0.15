@@ -400,11 +400,9 @@ class PaymentService
         }
         if($paymentKey == 'NOVALNET_CC') {
                     $onHoldLimit = $this->paymentHelper->getNovalnetConfig('novalnet_cc_on_hold');
-                    if($this->config->get('Novalnet.novalnet_cc_3d') == 'true' || $this->config->get('Novalnet.novalnet_cc_3d_fraudcheck') == 'true' ) {
-                    if($this->config->get('Novalnet.novalnet_cc_3d') == 'true') {
-                        $paymentRequestData['cc_3d'] = '1';
-                    }
-                    $url = NovalnetConstants::CC3D_PAYMENT_URL;
+                    if($this->config->get('Novalnet.novalnet_cc_enforce') == 'true') {
+                        $paymentRequestData['enforce_3d'] = '1';
+			$url = NovalnetConstants::CC3D_PAYMENT_URL;
                     }
         } else if($paymentKey == 'NOVALNET_SEPA') {
                     $dueDate = $this->paymentHelper->getNovalnetConfig('novalnet_sepa_due_date');
@@ -539,7 +537,7 @@ class PaymentService
      * @param string $paymentKey
      */
     public function isRedirectPayment($paymentKey) {
-        return (bool) (in_array($paymentKey, $this->redirectPayment) || ($paymentKey == 'NOVALNET_CC' && ($this->config->get('Novalnet.novalnet_cc_3d') == 'true' || $this->config->get('Novalnet.novalnet_cc_3d_fraudcheck') == 'true' )));
+        return (bool) (in_array($paymentKey, $this->redirectPayment) || ($paymentKey == 'NOVALNET_CC' && ($this->config->get('Novalnet.novalnet_cc_enforce') == 'true' )));
     }
 
     /**
