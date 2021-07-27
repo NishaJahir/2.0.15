@@ -257,14 +257,15 @@ class NovalnetServiceProvider extends ServiceProvider
                                         $contentType = 'continue';
                            }
                         } elseif ($paymentKey == 'NOVALNET_CC') { # Credit Card
-                            $encodedKey = base64_encode('vendor='.$paymentHelper->getNovalnetConfig('novalnet_vendor_id').'&product='.$paymentHelper->getNovalnetConfig('novalnet_product_id').'&server_ip='.$paymentHelper->getServerAddress().'&lang='.$sessionStorage->getLocaleSettings()->language);
-                            $nnIframeSource = 'https://secure.novalnet.de/cc?api=' . $encodedKey;
+			    $ccFormDetails = $paymentService->getCcFormData($basket, $paymentKey);
+                            $ccCustomFields = $paymentService->getCcFormFields();
+			
                             $content = $twig->render('Novalnet::PaymentForm.NOVALNET_CC', [
-                                'nnCcFormUrl'           => $nnIframeSource,
                                 'nnPaymentProcessUrl'   => $paymentService->getProcessPaymentUrl(),
                                 'paymentMopKey'         =>  $paymentKey,
                                 'paymentName' => $paymentName,
-                                'nnFormDesign'          =>  $paymentService->getCcDesignConfig()
+				'ccFormDetails'       => !empty($ccFormDetails) ? $ccFormDetails : '',
+                                'ccCustomFields'       => !empty($ccCustomFields) ? $ccCustomFields : ''
                                        ]);
                             $contentType = 'htmlContent';
                         } elseif($paymentKey == 'NOVALNET_SEPA') {
