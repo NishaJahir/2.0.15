@@ -480,6 +480,34 @@ class PaymentService
         }
         return json_encode($ccFormRequestParameters);
     }
+	
+    /**
+     * Form customer billing and shipping details
+     *
+     * @param object $billingAddress
+     * @param object $shippingAddress
+     *
+     * @return array
+     */
+    public function getBillingShippingDetails($billingAddress, $shippingAddress) 
+    {
+        $billingShippingDetails = [];
+        $billingShippingDetails['billing']     = [
+                'street'       => $billingAddress->street,
+                'house_no'     => $billingAddress->houseNumber,
+                'city'         => $billingAddress->town,
+                'zip'          => $billingAddress->postalCode,
+                'country_code' => strtoupper($this->countryRepository->findIsoCode($billingAddress->countryId, 'iso_code_2'))
+            ];
+         $billingShippingDetails['shipping']    = [
+                'street'   => $shippingAddress->street,
+                'house_no'     => $shippingAddress->houseNumber,
+                'city'     => $shippingAddress->town,
+                'zip' => $shippingAddress->postalCode,
+                'country_code' => strtoupper($this->countryRepository->findIsoCode($shippingAddress->countryId, 'iso_code_2'))
+            ];
+        return $billingShippingDetails;
+    }
     
     /**
      * Retrieves Credit Card form style set in payment configuration and texts present in language files
