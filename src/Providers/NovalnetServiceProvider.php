@@ -257,7 +257,7 @@ class NovalnetServiceProvider extends ServiceProvider
                                         $contentType = 'continue';
                            }
                         } elseif ($paymentKey == 'NOVALNET_CC') { # Credit Card
-			    $ccFormDetails = $paymentService->getCcFormData($basket, $paymentKey);
+			    $ccFormDetails = $paymentService->getCreditCardAuthenticationCallData($basket, $paymentKey);
                             $ccCustomFields = $paymentService->getCcFormFields();
 			
                             $content = $twig->render('Novalnet::PaymentForm.NOVALNET_CC', [
