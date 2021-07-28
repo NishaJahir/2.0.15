@@ -317,7 +317,7 @@
                "required":false,
                "label":"Config.novalnetCcStandardStyleCssLabel",
                "options":{  
-                  "defaultValue":"body{color: #555;font-family: Verdana,Arial,sans-serif;font-size:12px;line-height: 1.5;}.label-group{width:152px !important;float:unset !important;}.row{float:unset !important;}.input-group{float:right;}"
+                  "defaultValue":"body{color: #555;font-family: Verdana,Arial,sans-serif;font-size:12px;line-height: 1.5;}.label-group{width:152px !important;float:unset !important;}.expiry_date .cvc{width:100%;}"
                }
             },
             "novalnet_cc_minimum_order_amount":{  
