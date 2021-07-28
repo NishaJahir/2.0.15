@@ -25,6 +25,7 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Novalnet\Services\PaymentService;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Log\Loggable; 
 
 
 /**
@@ -34,6 +35,7 @@ use Plenty\Plugin\ConfigRepository;
  */
 class PaymentController extends Controller
 {
+    use Loggable;
     
     /**
      * @var Request
@@ -154,7 +156,13 @@ class PaymentController extends Controller
             }
        }
         
-        $serverRequestData = $this->paymentService->getRequestParameters($this->basketRepository->load(), $requestData['paymentKey']);
+        $doRedirect = false;
+        if(!empty($requestData['nn_cc3d_redirect']) ) {
+              $doRedirect = true;
+        }
+        $serverRequestData = $this->paymentService->getRequestParameters($this->basketRepository->load(), $requestData['paymentKey'], $doRedirect);
+        
+        $this->getLogger(__METHOD__)->error('request', $serverRequestData);
         if (empty($serverRequestData['data']['first_name']) && empty($serverRequestData['data']['last_name'])) {
         $notificationMessage = $this->paymentHelper->getTranslatedText('nn_first_last_name_error');
                 $this->paymentService->pushNotification($notificationMessage, 'error', 100);
