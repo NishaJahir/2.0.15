@@ -588,7 +588,8 @@ class CallbackController extends Controller
         else
         {
             $orderId= (!empty($this->aryCaptureParams['order_no'])) ? $this->aryCaptureParams['order_no'] : '';
-            if(!empty($orderId))
+            $transactionDetails = $this->transaction->getTransactionData('orderNo', $orderId);
+            if(!empty($orderId) && empty($transactionDetails[0]->tid))
             {
                 $order_ref = $this->orderObject($orderId);
                 return $this->handleCommunicationBreak($order_ref);                
