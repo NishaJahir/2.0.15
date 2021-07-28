@@ -243,7 +243,7 @@ class NovalnetServiceProvider extends ServiceProvider
 
                         $name = trim($config->get('Novalnet.' . strtolower($paymentKey) . '_payment_name'));
                         $paymentName = ($name ? $name : $paymentHelper->getTranslatedText(strtolower($paymentKey)));
-                        $redirect = $paymentService->isRedirectPayment($paymentKey);    
+                        $redirect = $paymentService->isRedirectPayment($paymentKey, false);    
                             
                         if ($redirect && $paymentKey != 'NOVALNET_CC') { # Redirection payments
                             $serverRequestData = $paymentService->getRequestParameters($basketRepository->load(), $paymentKey);
