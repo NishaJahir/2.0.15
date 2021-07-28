@@ -184,12 +184,12 @@ class PaymentController extends Controller
         if($requestData['paymentKey'] == 'NOVALNET_CC') {
             $serverRequestData['data']['pan_hash'] = $requestData['nn_pan_hash'];
             $serverRequestData['data']['unique_id'] = $requestData['nn_unique_id'];
+	    $this->sessionStorage->getPlugin()->setValue('nnDoRedirect', $requestData['nn_cc3d_redirect']);
             if(!empty($requestData['nn_cc3d_redirect']) )
             {
                 $this->getLogger(__METHOD__)->error('do redirect', $requestData['nn_cc3d_redirect']);
                 $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $serverRequestData['data']);
                 $this->sessionStorage->getPlugin()->setValue('nnPaymentUrl',$serverRequestData['url']);
-                $this->sessionStorage->getPlugin()->setValue('nnDoRedirect', $requestData['nn_cc3d_redirect']);
                 $this->paymentService->pushNotification($notificationMessage, 'success', 100);
                 return $this->response->redirectTo('place-order');
             }
