@@ -943,8 +943,6 @@ class PaymentService
 			$this->pushNotification($notificationMessage, 'success', 100);
 			
 		} else {
-			$orderStatus = trim($this->config->get('Novalnet.novalnet_order_cancel_status'));
-			$this->paymentHelper->updateOrderStatus((int)$responseData['order_no'], $orderStatus);
 			$this->pushNotification($notificationMessage, 'error', 100);
 		}
 		  
