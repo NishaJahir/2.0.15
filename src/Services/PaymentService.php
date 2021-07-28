@@ -254,10 +254,11 @@ class PaymentService
      *
      * @param Basket $basket
      * @param PaymentKey $paymentKey
+     * @param bool $doRedirect
      *
      * @return array
      */
-    public function getRequestParameters(Basket $basket, $paymentKey = '')
+    public function getRequestParameters(Basket $basket, $paymentKey = '', $doRedirect = false)
     {
         
      /** @var \Plenty\Modules\Frontend\Services\VatService $vatService */
@@ -331,7 +332,7 @@ class PaymentService
             $paymentRequestData['tel'] = $address->phone;
         }
 
-        $url = $this->getPaymentData($paymentKey, $paymentRequestData);
+        $url = $this->getPaymentData($paymentKey, $paymentRequestData, $doRedirect);
         return [
             'data' => $paymentRequestData,
             'url'  => $url
@@ -371,8 +372,9 @@ class PaymentService
      *
      * @param array $paymentRequestData
      * @param string $paymentKey
+     * @param bool $doRedirect
      */
-    public function getPaymentData($paymentKey, &$paymentRequestData )
+    public function getPaymentData($paymentKey, &$paymentRequestData, $doRedirect )
     {
         $url = $this->getpaymentUrl($paymentKey);
         if(in_array($paymentKey, ['NOVALNET_CC', 'NOVALNET_SEPA', 'NOVALNET_PAYPAL', 'NOVALNET_INVOICE'])) {
@@ -413,7 +415,7 @@ class PaymentService
         }
         }
 
-        if($this->isRedirectPayment($paymentKey))
+        if($this->isRedirectPayment($paymentKey) || $doRedirect == true)
         {
         $paymentRequestData['uniqid'] = $this->paymentHelper->getUniqueId();
         $this->encodePaymentData($paymentRequestData);
