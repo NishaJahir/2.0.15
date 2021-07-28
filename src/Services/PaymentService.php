@@ -199,33 +199,16 @@ class PaymentService
     {
         try {
             if(!$callbackfailure &&  in_array($requestData['status'], ['100', '90'])) {
-                if(in_array($requestData['tid_status'], ['86', '90'])) {
-                    $requestData['order_status'] = trim($this->config->get('Novalnet.'. $requestData['payment_method'] .'_payment_pending_status'));
+                if(in_array($requestData['tid_status'], ['75', '85', '86', '90', '91', '98', '99']) || in_array($requestData['payment_id'], ['27', '59']) && $requestData['tid_status'] == '100') {
                     $requestData['paid_amount'] = 0;
-                } elseif($requestData['tid_status'] == '75') {
-                    $requestData['order_status'] = trim($this->config->get('Novalnet.'. $requestData['payment_method'] .'_payment_guarantee_status'));
-                    $requestData['paid_amount'] = 0;
-                } elseif($requestData['payment_id'] == '41' && $requestData['tid_status'] == '100') {
-                    $requestData['order_status'] = trim($this->config->get('Novalnet.novalnet_invoice_payment_guarantee_order_completion_status'));
-                    $requestData['paid_amount'] = $requestData['amount'];
-                } elseif(in_array($requestData['payment_id'], ['27', '59']) && $requestData['tid_status'] == '100') {
-                    $requestData['order_status'] = trim($this->config->get('Novalnet.'. $requestData['payment_method'] .'_order_completion_status'));
-                    $requestData['paid_amount'] = 0;
-                } elseif(in_array($requestData['tid_status'], ['85', '91', '98', '99'])) {
-                    $requestData['order_status'] = trim($this->config->get('Novalnet.novalnet_onhold_confirmation_status'));
-                    $requestData['paid_amount'] = 0;
-                }
-            else {
-                    $requestData['order_status'] = trim($this->config->get('Novalnet.'. $requestData['payment_method'] .'_order_completion_status'));
+                } else {
                     $requestData['paid_amount'] = ($requestData['tid_status'] == '100') ? $requestData['amount'] : '0';
                 }
             } else {
-                $requestData['order_status'] = trim($this->config->get('Novalnet.novalnet_order_cancel_status'));
                 $requestData['paid_amount'] = '0';
             }
         
             $this->paymentHelper->createPlentyPayment($requestData);
-            $this->paymentHelper->updateOrderStatus((int)$requestData['order_no'], $requestData['order_status']);
            
             return [
                 'type' => 'success',
