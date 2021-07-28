@@ -175,10 +175,9 @@ class PaymentController extends Controller
             $serverRequestData['data']['unique_id'] = $requestData['nn_unique_id'];
             if(!empty($requestData['nn_cc3d_redirect']) )
             {
-                
+                $this->getLogger(__METHOD__)->error('do redirect', $requestData['nn_cc3d_redirect']);
                 $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $serverRequestData['data']);
-                $this->sessionStorage->getPlugin()->setValue('nnPaymentUrl', NovalnetConstants::CC3D_PAYMENT_URL);
-                $this->sessionStorage->getPlugin()->setValue('nnDoRedirect',$requestData['nn_cc3d_redirect']);
+                $this->sessionStorage->getPlugin()->setValue('nnPaymentUrl',$serverRequestData['url']);
                 $this->paymentService->pushNotification($notificationMessage, 'success', 100);
                 return $this->response->redirectTo('place-order');
             }
