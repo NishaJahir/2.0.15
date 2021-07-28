@@ -414,7 +414,7 @@ class PaymentService
         }
         }
 
-        if($this->isRedirectPayment($paymentKey) || $doRedirect == true)
+        if($this->isRedirectPayment($paymentKey, $doRedirect))
         {
         $paymentRequestData['uniqid'] = $this->paymentHelper->getUniqueId();
         $this->encodePaymentData($paymentRequestData);
@@ -523,9 +523,11 @@ class PaymentService
      * Check if the payment is redirection or not
      *
      * @param string $paymentKey
+     * @param string $doRedirect
+     *
      */
-    public function isRedirectPayment($paymentKey) {
-        return (bool) (in_array($paymentKey, $this->redirectPayment) );
+    public function isRedirectPayment($paymentKey, $doRedirect) {
+        return (bool) (in_array($paymentKey, $this->redirectPayment) || $doRedirect == true);
     }
 
     /**
