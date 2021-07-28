@@ -384,10 +384,12 @@ class PaymentService
             $paymentRequestData['on_hold'] = '1';
         }
         if($paymentKey == 'NOVALNET_CC') {
-                    $onHoldLimit = $this->paymentHelper->getNovalnetConfig('novalnet_cc_on_hold');
                     if($this->config->get('Novalnet.novalnet_cc_enforce') == 'true') {
                         $paymentRequestData['enforce_3d'] = '1';
                     }
+		    if($doRedirect == true) {
+			 $url = NovalnetConstants::CC3D_PAYMENT_URL; 
+		    }
         } else if($paymentKey == 'NOVALNET_SEPA') {
                     $dueDate = $this->paymentHelper->getNovalnetConfig('novalnet_sepa_due_date');
                     if(is_numeric($dueDate) && $dueDate >= 2 && $dueDate <= 14) {
