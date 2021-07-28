@@ -298,6 +298,8 @@ class CallbackController extends Controller
             }
             if($this->getPaymentTypeLevel() == 2 && $this->aryCaptureParams['tid_status'] == '100')
             {
+                $nnTransactionHistory->additionalInfo = ['type' => 'credit'];
+                
                 // Credit entry for the payment types Invoice, Prepayment and Cashpayment.
                 if(in_array($this->aryCaptureParams['payment_type'], ['INVOICE_CREDIT', 'CASHPAYMENT_CREDIT', 'ONLINE_TRANSFER_CREDIT']))
                 {
@@ -346,6 +348,7 @@ class CallbackController extends Controller
             else if($this->getPaymentTypeLevel() == 1 && $this->aryCaptureParams['tid_status'] == 100)
             {
                 
+                $nnTransactionHistory->additionalInfo = ['type'=>'debit'];
                 $callbackComments = (in_array($this->aryCaptureParams['payment_type'], ['CREDITCARD_BOOKBACK', 'PAYPAL_BOOKBACK', 'REFUND_BY_BANK_TRANSFER_EU', 'PRZELEWY24_REFUND', 'CASHPAYMENT_REFUND', 'GUARANTEED_INVOICE_BOOKBACK', 'GUARANTEED_SEPA_BOOKBACK'])) ? sprintf($this->paymentHelper->getTranslatedText('callback_bookback_execution',$orderLanguage), $nnTransactionHistory->tid, sprintf('%0.2f', ($this->aryCaptureParams['amount']/100)) , $this->aryCaptureParams['currency'], date('Y-m-d H:i:s'), $this->aryCaptureParams['tid'] ) . '</br>' : sprintf( $this->paymentHelper->getTranslatedText('callback_chargeback_execution',$orderLanguage), $nnTransactionHistory->tid, sprintf( '%0.2f',( $this->aryCaptureParams['amount']/100) ), $this->aryCaptureParams['currency'], date('Y-m-d H:i:s'), $this->aryCaptureParams['tid'] ) . '</br>';
                 
                 $this->saveTransactionLog($nnTransactionHistory);
@@ -356,22 +359,30 @@ class CallbackController extends Controller
                 $paymentData['type']        = 'debit';
                 $paymentData['order_no']    = $nnTransactionHistory->orderNo;
                 $paymentData['mop']         = $nnTransactionHistory->mopId;
-        $paymentData['tid_status']  = $this->aryCaptureParams['tid_status'];
-            
-            $total_order_details = $this->transaction->getTransactionData('orderNo', $nnTransactionHistory->orderNo);
-        
-            $totalCallbackAmount = 0;
-            foreach($total_order_details as $total_order_detail) {
-                 
-                if ($total_order_detail->referenceTid != $total_order_detail->tid) {
-                    
-                    $totalCallbackAmount += $total_order_detail->callbackAmount;
-                    $partial_refund_amount = ($nnTransactionHistory->order_total_amount > ($totalCallbackAmount + $this->aryCaptureParams['amount']) )? true : false;
-                }
-                
-          }
+				$paymentData['tid_status']  = $this->aryCaptureParams['tid_status'];
+		    
+				$total_order_details = $this->transaction->getTransactionData('orderNo', $nnTransactionHistory->orderNo);
+		
+		    
+                $totalCallbackDebitAmount = 0;
 
-                $this->paymentHelper->createPlentyPayment($paymentData, $partial_refund_amount);
+                    foreach($total_order_details as $total_order_detail) {
+                        if ($total_order_detail->referenceTid != $total_order_detail->tid) {
+                         if(!empty($total_order_detail->additionalInfo)) {
+                            $additionalInfo = json_decode($total_order_detail->additionalInfo, true);
+                             if($additionalInfo['type'] == 'debit') {
+                                $totalCallbackDebitAmount += $total_order_detail->callbackAmount;  
+                             }
+
+                         } else {
+                             $totalCallbackDebitAmount += $total_order_detail->callbackAmount;
+                         }
+                        }
+
+                  }
+
+                $partial_refund_amount = ($nnTransactionHistory->order_total_amount > ($totalCallbackDebitAmount) ) ? true : false;
+                $this->paymentHelper->updatePayments($this->aryCaptureParams['shop_tid'], $this->aryCaptureParams['tid_status'], $nnTransactionHistory->orderNo, true, $partial_refund_amount);
                 $this->sendCallbackMail($callbackComments);
                 return $this->renderTemplate($callbackComments);
             }
