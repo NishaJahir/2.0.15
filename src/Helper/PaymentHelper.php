@@ -573,19 +573,24 @@ class PaymentHelper
      * @param int $orderId
      * @return null
      */
-    public function updatePayments($tid, $tid_status, $orderId)
+   public function updatePayments($tid, $tid_status, $orderId, $refund_process=false, $partial_refund=false)
     {    
         $payments = $this->paymentRepository->getPaymentsByOrderId($orderId);
-        foreach ($payments as $payment) {
+        $paymentCreate = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
+        
+        $finalPaymentDetails = end($payments);
         $paymentProperty     = [];
         $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $tid);
         $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $tid);
         $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
         $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $tid_status);
-        $payment->properties = $paymentProperty;   
-    
-        $this->paymentRepository->updatePayment($payment);
-        }      
+        $finalPaymentDetails->properties = $paymentProperty; 
+        if ($refund_process == true) {
+        
+        $finalPaymentDetails->status =  ($partial_refund == true) ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED;
+        
+        }
+        $this->paymentRepository->updatePayment($finalPaymentDetails);
     }
     
     /**
@@ -653,7 +658,7 @@ class PaymentHelper
         $payment->updateOrderPaymentStatus = true;
         $payment->mopId = (int) $mop;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status =  ($partial_refund_amount == true) ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED;
+        $payment->status = Payment::STATUS_CAPTURED;
         $payment->currency = $currency;
         $payment->amount = $paymentData['refunded_amount'];
         $payment->receivedAt = date('Y-m-d H:i:s');
