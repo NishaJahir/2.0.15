@@ -371,7 +371,7 @@ class NovalnetServiceProvider extends ServiceProvider
 		    $doRedirect = $sessionStorage->getPlugin()->getValue('nnDoRedirect');
 		    
 
-                    if(!$paymentService->isRedirectPayment($paymentKey) && empty($doRedirect)) {
+                    if(!$paymentService->isRedirectPayment($paymentKey, $doRedirect)) {
 						 $paymentService->paymentCalltoNovalnetServer();
                          $paymentService->validateResponse();
                     } else {
