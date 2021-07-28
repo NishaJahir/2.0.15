@@ -368,8 +368,10 @@ class NovalnetServiceProvider extends ServiceProvider
                     $sessionStorage->getPlugin()->setValue('mop',$event->getMop());
                     $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
                     $sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
+		    $doRedirect = $sessionStorage->getPlugin()->getValue('nnDoRedirect');
+		    
 
-                    if(!$paymentService->isRedirectPayment($paymentKey)) {
+                    if(!$paymentService->isRedirectPayment($paymentKey) && empty($doRedirect)) {
 						 $paymentService->paymentCalltoNovalnetServer();
                          $paymentService->validateResponse();
                     } else {
