@@ -523,7 +523,7 @@ class PaymentService
      * Check if the payment is redirection or not
      *
      * @param string $paymentKey
-     * @param string $doRedirect
+     * @param bool $doRedirect
      *
      */
     public function isRedirectPayment($paymentKey, $doRedirect) {
