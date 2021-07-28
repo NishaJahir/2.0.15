@@ -387,7 +387,6 @@ class PaymentService
                     $onHoldLimit = $this->paymentHelper->getNovalnetConfig('novalnet_cc_on_hold');
                     if($this->config->get('Novalnet.novalnet_cc_enforce') == 'true') {
                         $paymentRequestData['enforce_3d'] = '1';
-			$url = NovalnetConstants::CC3D_PAYMENT_URL;
                     }
         } else if($paymentKey == 'NOVALNET_SEPA') {
                     $dueDate = $this->paymentHelper->getNovalnetConfig('novalnet_sepa_due_date');
