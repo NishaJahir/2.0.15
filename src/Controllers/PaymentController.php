@@ -26,7 +26,7 @@ use Novalnet\Services\PaymentService;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable; 
-use Novalnet\Constants\NovalnetConstants;
+use Novalnet\Services\TransactionService;
 
 /**
  * Class PaymentController
@@ -81,6 +81,11 @@ class PaymentController extends Controller
      * @var ConfigRepository
      */
     private $config;
+    
+    /**
+     * @var transaction
+     */
+    private $transaction; 
 
     /**
      * PaymentController constructor.
@@ -92,6 +97,7 @@ class PaymentController extends Controller
      * @param SessionStorageService $sessionStorage
      * @param BasketRepositoryContract $basketRepository
      * @param PaymentService $paymentService
+     * @param TransactionService $tranactionService
      * @param Twig $twig
      */
     public function __construct(  Request $request,
@@ -102,6 +108,7 @@ class PaymentController extends Controller
                                   FrontendSessionStorageFactoryContract $sessionStorage,
                                   BasketRepositoryContract $basketRepository,             
                                   PaymentService $paymentService,
+                                  TransactionService $tranactionService,
                                   Twig $twig
                                 )
     {
@@ -115,6 +122,7 @@ class PaymentController extends Controller
         $this->paymentService  = $paymentService;
         $this->twig            = $twig;
         $this->config          = $config;
+        $this->transaction     = $tranactionService;
     }
 
     /**
@@ -133,9 +141,12 @@ class PaymentController extends Controller
         
         $responseData['test_mode'] = $this->paymentHelper->decodeData($responseData['test_mode'], $responseData['uniqid']);
         $responseData['amount']    = $this->paymentHelper->decodeData($responseData['amount'], $responseData['uniqid']) / 100;
-        $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+        $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentDataUpdated');
         $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $responseData));
-        $this->paymentService->validateResponse();
+        $transactionDetails = $this->transaction->getTransactionData('orderNo', $responseData['order_no']);
+        if(empty($transactionDetails[0]->tid)) {         
+			$this->paymentService->validateResponse();
+		}
         return $this->response->redirectTo('confirmation');
     }
 
@@ -235,11 +246,18 @@ class PaymentController extends Controller
         $orderNo = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
         $paymentRequestData['order_no'] = $orderNo;
         $paymentUrl = $this->sessionStorage->getPlugin()->getValue('nnPaymentUrl');
+        $this->sessionStorage->getPlugin()->setValue('nnPaymentData', null);
+        $this->sessionStorage->getPlugin()->setValue('nnOrderNo', null);
 
-        return $this->twig->render('Novalnet::NovalnetPaymentRedirectForm', [
+		if(!empty($paymentRequestData['order_no'])) {
+			$this->sessionStorage->getPlugin()->setValue('nnPaymentDataUpdated', $paymentRequestData);	
+			return $this->twig->render('Novalnet::NovalnetPaymentRedirectForm', [
                                                                'formData'     => $paymentRequestData,
                                                                 'nnPaymentUrl' => $paymentUrl
                                    ]);
+        } else {			
+			return $this->response->redirectTo('confirmation');
+		  }
     }
     
 }
