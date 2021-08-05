@@ -1,6 +1,13 @@
 jQuery(document).ready(function () {
-     loadNovalnetCcIframe();
-     console.log( NovalnetUtility );
+     if(typeof(window.NovalnetUtility) === 'undefined') {
+           setTimeout(function(){
+               console.log('enter in undefined');
+               loadNovalnetCcIframe();
+          },500);
+          } else {
+               console.log('enter in normal');
+             loadNovalnetCcIframe();
+          }
         jQuery('#nn_cc_form').submit( function (e) {
                 if(jQuery('#nn_pan_hash').val().trim() == '') {
                     NovalnetUtility.getPanHash();
