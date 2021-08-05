@@ -3,7 +3,7 @@ jQuery(document).ready(function () {
            setTimeout(function(){
                console.log('enter in undefined');
                loadNovalnetCcIframe();
-          },500);
+          },1000);
           } else {
                console.log('enter in normal');
              loadNovalnetCcIframe();
