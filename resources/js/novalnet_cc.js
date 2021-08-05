@@ -1,5 +1,6 @@
 jQuery(document).ready(function () {
      loadNovalnetCcIframe();
+     console.log( NovalnetUtility );
         jQuery('#nn_cc_form').submit( function (e) {
                 if(jQuery('#nn_pan_hash').val().trim() == '') {
                     NovalnetUtility.getPanHash();
