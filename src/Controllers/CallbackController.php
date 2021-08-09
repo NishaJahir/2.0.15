@@ -319,19 +319,6 @@ class CallbackController extends Controller
                             $this->paymentHelper->createPlentyPayment($paymentData);
                             $this->sendCallbackMail($callbackComments);
                             return $this->renderTemplate($callbackComments);
-                        } elseif ($this->aryCaptureParams['payment_type'] == 'ONLINE_TRANSFER_CREDIT') {
-                            $paymentData['currency']    = $this->aryCaptureParams['currency'];
-                            $paymentData['paid_amount'] = (float) ($this->aryCaptureParams['amount'] / 100);
-                            $paymentData['tid']         = $this->aryCaptureParams['tid'];
-                            $paymentData['order_no']    = $nnTransactionHistory->orderNo;
-                            $paymentData['mop']         = $nnTransactionHistory->mopId;
-                $paymentData['tid_status']  = $this->aryCaptureParams['tid_status'];
-                            $this->paymentHelper->createPlentyPayment($paymentData);
-                            
-                            $callbackComments  = sprintf($this->paymentHelper->getTranslatedText('callback_initial_execution',$orderLanguage), $this->aryCaptureParams['shop_tid'], ($this->aryCaptureParams['amount'] / 100), $this->aryCaptureParams['currency'], date('d.m.Y'), date('H:i:s'), $this->aryCaptureParams['tid'] ).'</br>';
-                            $callbackComments .= sprintf($this->paymentHelper->getTranslatedText('callback_status_change',$orderLanguage), (float) ($this->aryCaptureParams['amount'] / 100), $nnTransactionHistory->orderNo );
-                            $this->sendCallbackMail($callbackComments);
-                return $this->renderTemplate($callbackComments);
                         } 
                         else
                         {
