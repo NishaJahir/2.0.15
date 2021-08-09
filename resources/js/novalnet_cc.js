@@ -12,7 +12,7 @@ jQuery(document).ready(function () {
                 jQuery('#novalnet_form_btn').attr('disabled',true);
                
                 if(jQuery('#nn_pan_hash').val().trim() == '') {
-                    jQuery( '#nn_cc_form' ).css('pointer-events', 'none', 'cursor', 'default');
+                    jQuery( '#nn_iframe' ).css('pointer-events', 'none', 'cursor', 'default');
                     NovalnetUtility.getPanHash();
                     e.preventDefault();
                     e.stopImmediatePropagation();
@@ -40,7 +40,7 @@ function loadNovalnetCcIframe()
           on_error: function (result) {
            if ( undefined !== result['error_message'] ) {
                 jQuery('#novalnet_form_btn').attr('disabled',false);
-                jQuery( '#nn_cc_form' ).css('pointer-events', 'auto', 'cursor', 'auto');
+                jQuery( '#nn_iframe' ).css('pointer-events', 'auto', 'cursor', 'auto');
               alert(result['error_message']);
               return false;
             }
