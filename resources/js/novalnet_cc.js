@@ -31,11 +31,14 @@ function loadNovalnetCcIframe()
             jQuery('#nn_pan_hash').val(result['hash']);
             jQuery('#nn_unique_id').val(result['unique_id']);
             jQuery('#nn_cc3d_redirect').val(result['do_redirect']);
+            jQuery('#novalnet_form_btn').attr('disabled',true);
             jQuery('#nn_cc_form').submit();
+            jQuery('.loader').show();
             return true;
           },
           on_error: function (result) {
            if ( undefined !== result['error_message'] ) {
+                jQuery('#novalnet_form_btn').attr('disabled',false);
               alert(result['error_message']);
               return false;
             }
