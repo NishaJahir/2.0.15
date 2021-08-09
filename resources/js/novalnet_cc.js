@@ -10,6 +10,7 @@ jQuery(document).ready(function () {
           }
         jQuery('#nn_cc_form').submit( function (e) {
                 jQuery('#novalnet_form_btn').attr('disabled',true);
+             jQuery('#nn_iframe').hide();
                 jQuery('.loader').show();
                 if(jQuery('#nn_pan_hash').val().trim() == '') {
                     NovalnetUtility.getPanHash();
@@ -39,6 +40,8 @@ function loadNovalnetCcIframe()
           on_error: function (result) {
            if ( undefined !== result['error_message'] ) {
                 jQuery('#novalnet_form_btn').attr('disabled',false);
+                jQuery('#nn_iframe').show();
+                jQuery('.loader').hide();
               alert(result['error_message']);
               return false;
             }
@@ -123,5 +126,5 @@ function loadNovalnetCcIframe()
       };
 
       NovalnetUtility.createCreditCardForm(requestData);
-     jQuery('.loader').hide(500);
+     jQuery('.loader').hide(700);
 }
