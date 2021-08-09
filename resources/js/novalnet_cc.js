@@ -19,7 +19,6 @@ jQuery(document).ready(function () {
 
 function loadNovalnetCcIframe()
 {
-     jQuery('.loader').hide();
      var ccCustomFields = jQuery('#nn_cc_formfields').val() != '' ? JSON.parse(jQuery('#nn_cc_formfields').val()) : null;
      var ccFormDetails= jQuery('#nn_cc_formdetails').val() != '' ? JSON.parse(jQuery('#nn_cc_formdetails').val()) : null;
     
@@ -121,4 +120,5 @@ function loadNovalnetCcIframe()
       };
 
       NovalnetUtility.createCreditCardForm(requestData);
+     jQuery('.loader').hide(700);
 }
