@@ -9,6 +9,8 @@ jQuery(document).ready(function () {
              loadNovalnetCcIframe();
           }
         jQuery('#nn_cc_form').submit( function (e) {
+                jQuery('#novalnet_form_btn').attr('disabled',true);
+                jQuery('.loader').show();
                 if(jQuery('#nn_pan_hash').val().trim() == '') {
                     NovalnetUtility.getPanHash();
                     e.preventDefault();
@@ -31,9 +33,7 @@ function loadNovalnetCcIframe()
             jQuery('#nn_pan_hash').val(result['hash']);
             jQuery('#nn_unique_id').val(result['unique_id']);
             jQuery('#nn_cc3d_redirect').val(result['do_redirect']);
-            jQuery('#novalnet_form_btn').attr('disabled',true);
             jQuery('#nn_cc_form').submit();
-            jQuery('.loader').show();
             return true;
           },
           on_error: function (result) {
@@ -123,5 +123,5 @@ function loadNovalnetCcIframe()
       };
 
       NovalnetUtility.createCreditCardForm(requestData);
-     jQuery('.loader').hide(700);
+     jQuery('.loader').hide(500);
 }
