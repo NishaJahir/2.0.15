@@ -319,9 +319,9 @@ class CallbackController extends Controller
                             $this->paymentHelper->createPlentyPayment($paymentData);
 				
                             $this->sendCallbackMail($callbackComments);
-				$this->getLogger(__METHOD__)->error('cal', $callbackComments);
-			   return $this->twig->render('Novalnet::NovalnetOrderHistory', ['comments' => html_entity_decode($callbackComments)]);
 				
+			   return $this->twig->render('Novalnet::NovalnetOrderHistory', ['comments' => $callbackComments]);
+				$this->getLogger(__METHOD__)->error('cal test', $callbackComments);
                             return $this->renderTemplate($callbackComments);
                         } 
                         else
