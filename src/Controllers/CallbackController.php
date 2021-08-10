@@ -317,7 +317,9 @@ class CallbackController extends Controller
                             $paymentData['mop']         = $nnTransactionHistory->mopId;
                 $paymentData['tid_status']  = $this->aryCaptureParams['tid_status'];
                             $this->paymentHelper->createPlentyPayment($paymentData);
+				
                             $this->sendCallbackMail($callbackComments);
+			   $this->twig->render('Novalnet::NovalnetOrderHistory', ['comments' => html_entity_decode($callbackComments)]);
                             return $this->renderTemplate($callbackComments);
                         } 
                         else
