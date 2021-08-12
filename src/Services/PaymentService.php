@@ -160,8 +160,6 @@ class PaymentService
         $nnPaymentData['mop']            = $this->sessionStorage->getPlugin()->getValue('mop');
         $nnPaymentData['payment_method'] = strtolower($this->paymentHelper->getPaymentKeyByMop($nnPaymentData['mop']));
         
-	    $this->executePayment($nnPaymentData);
-        
         if($nnPaymentData['payment_id'] == '59' && !empty($nnPaymentData['cp_checkout_token']))
         {
         $this->sessionStorage->getPlugin()->setValue('novalnet_checkout_token', $nnPaymentData['cp_checkout_token']);
@@ -185,7 +183,7 @@ class PaymentService
 
         $this->transactionLogData->saveTransaction($transactionData);
 	    
-	
+	$this->executePayment($nnPaymentData);
 
      }
      
