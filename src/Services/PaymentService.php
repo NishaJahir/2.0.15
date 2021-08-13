@@ -232,16 +232,17 @@ class PaymentService
     public function getInvoicePrepaymentComments($requestData)
     {     
         $comments = '';
-        $comments .= PHP_EOL . PHP_EOL . $this->paymentHelper->getTranslatedText('transfer_amount_text');
+	
+	if($requestData['tid_status'] == '100' && !empty($requestData['due_date']) ) {
+	   $comments .= PHP_EOL . PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('transfer_amount_duedate_text'), $requestData['amount'], $requestData['currency'] , date('Y/m/d', (int)strtotime($requestData['due_date'])) );
+	} else {
+	   $comments .= PHP_EOL . PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('transfer_amount_text'), $requestData['amount'], $requestData['currency'] );	
+	}
+        
         $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('account_holder_novalnet') . $requestData['invoice_account_holder'];
         $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('iban') . $requestData['invoice_iban'];
         $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('bic') . $requestData['invoice_bic'];
-        if($requestData['due_date'])
-        {
-        $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('due_date') . date('Y/m/d', (int)strtotime($requestData['due_date']));
-        }
         $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('bank') . $requestData['invoice_bankname']. ' ' . $requestData['invoice_bankplace'];
-        $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('amount') . $requestData['amount'] . ' ' . $requestData['currency'];
 
         $comments .= PHP_EOL . PHP_EOL .$this->paymentHelper->getTranslatedText('any_one_reference_text');
         $comments .= PHP_EOL . $this->paymentHelper->getTranslatedText('payment_reference1').' ' .('BNR-' . $requestData['product_id'] . '-' . $requestData['order_no']). PHP_EOL. $this->paymentHelper->getTranslatedText('payment_reference2') .' ' . 'TID '. $requestData['tid']. PHP_EOL;
