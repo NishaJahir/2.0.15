@@ -407,7 +407,7 @@ class PaymentService
         } else if($paymentKey == 'NOVALNET_PREPAYMENT') {
         	$paymentRequestData['invoice_type'] = 'PREPAYMENT';
 		$prepaymentDueDate = $this->paymentHelper->getNovalnetConfig('novalnet_prepayment_due_date');
-	        if(is_numeric($prepaymentDueDate)) {
+	        if(is_numeric($prepaymentDueDate) && $prepaymentDueDate >= 7 && $prepaymentDueDate <= 28) {
 		$paymentRequestData['due_date'] = $this->paymentHelper->dateFormatter($prepaymentDueDate);
 	       }
         } else if($paymentKey == 'NOVALNET_CASHPAYMENT') {
