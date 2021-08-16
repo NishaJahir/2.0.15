@@ -232,7 +232,7 @@ class PaymentService
     public function getInvoicePrepaymentComments($requestData)
     {     
         $comments = '';
-	
+	$this->getLogger(__METHOD__)->error('ínvoice comment', $requestData);
 	if($requestData['tid_status'] == '100' && !empty($requestData['due_date']) ) {
 	   $comments .= PHP_EOL . PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('transfer_amount_duedate_text'), $requestData['amount'], $requestData['currency'] , date('Y/m/d', (int)strtotime($requestData['due_date'])) );
 	} else {
