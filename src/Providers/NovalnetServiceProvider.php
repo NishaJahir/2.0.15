@@ -430,7 +430,8 @@ class NovalnetServiceProvider extends ServiceProvider
                     $comments .= PHP_EOL . $paymentHelper->getTranslatedText('test_order');
                 }
                  if(in_array($tid_status, ['91', '100']) && ($db_details['payment_id'] == '27' && ($transaction_details->amount > $totalCallbackAmount) || $db_details['payment_id'] == '41') ) {
-                $comments .= PHP_EOL . $paymentService->getInvoicePrepaymentComments($bank_details);
+                	 $bank_details['tid_status'] = $tid_status;
+			 $comments .= PHP_EOL . $paymentService->getInvoicePrepaymentComments($bank_details);
                 
                 }
                  if($db_details['payment_id'] == '59' && ($transaction_details->amount > $totalCallbackAmount) && $tid_status == '100' ) {
