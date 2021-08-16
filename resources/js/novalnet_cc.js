@@ -34,7 +34,7 @@ function loadNovalnetCcIframe()
             jQuery('#nn_unique_id').val(result['unique_id']);
             jQuery('#nn_cc3d_redirect').val(result['do_redirect']);
             jQuery('#nn_cc_form').submit();
-            jQuery('.modal_cc_popup').hide();
+            jQuery('.modal').hide();
             return true;
           },
           on_error: function (result) {
