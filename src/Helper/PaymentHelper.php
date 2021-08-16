@@ -208,6 +208,10 @@ class PaymentHelper
             $payment->status = ($partial_refund == true )  ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED;
         }
         
+        if(!empty($requestData['unaccountable'])) {
+            $payment->unaccountable = 1;
+        }
+        
         $invoicePrepaymentDetails =  [
               'invoice_bankname'  => $requestData['invoice_bankname'],
               'invoice_bankplace' => $requestData['invoice_bankplace'],
