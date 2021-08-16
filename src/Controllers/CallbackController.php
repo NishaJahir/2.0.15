@@ -332,7 +332,15 @@ class CallbackController extends Controller
                 else
                 {
                             $callbackComments = sprintf($this->paymentHelper->getTranslatedText('callback_initial_execution',$orderLanguage), $this->aryCaptureParams['shop_tid'], ($this->aryCaptureParams['amount'] / 100), $this->aryCaptureParams['currency'], date('d.m.Y'), date('H:i:s'), $this->aryCaptureParams['tid'] ).'</br>';
-                            $this->sendCallbackMail($callbackComments);
+                        $paymentData['currency']    = $this->aryCaptureParams['currency'];
+                            $paymentData['paid_amount'] = (float) ($this->aryCaptureParams['amount'] / 100);
+                            $paymentData['tid']         = $this->aryCaptureParams['tid'];
+                            $paymentData['order_no']    = $nnTransactionHistory->orderNo;
+                            $paymentData['mop']         = $nnTransactionHistory->mopId;
+			    $paymentData['unaccountable']         = 1;
+                $paymentData['tid_status']  = $this->aryCaptureParams['tid_status'];
+                            $this->paymentHelper->createPlentyPayment($paymentData);    
+			$this->sendCallbackMail($callbackComments);
                             return $this->renderTemplate($callbackComments);
                 }
             }
