@@ -9,7 +9,7 @@
     <input type="hidden" id="nn_cc_formfields" name="nn_cc_formfields" value="{{ccCustomFields|escape}}" /> 
     <input type="hidden" id="nn_cc_formdetails" name="nn_cc_formdetails" value="{{ccFormDetails|escape}}" />
     <input type="hidden" id="paymentKey" name="paymentKey" value="{{paymentMopKey}}" />
-    
+    <div class="modal_cc_popup">
     <div class="modal-header">
 		<h4 class="modal-title">{{paymentName}}</h4>
         <button type="button" aria-label="Close" data-dismiss="modal" class="close" onClick="window.location.reload();">
@@ -28,5 +28,6 @@
             <i class="fa fa-check" aria-hidden="true"> </i>
             {{ trans("Novalnet::PaymentMethod.submit_button_text") }}
         </button>
+    </div>
     </div>
 </form>
