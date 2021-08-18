@@ -592,7 +592,7 @@ class PaymentHelper
         $finalPaymentDetails->properties = $paymentProperty; 
         if ($refund_process == true || $tid_status == '103') {
         
-        $finalPaymentDetails->status =  ($tid_status == '103' ? Payment::STATUS_CANCELED : ($partial_refund == true) ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED));
+        $finalPaymentDetails->status =  ($tid_status == '103' ? Payment::STATUS_CANCELED : ($partial_refund == true ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED));
         
         }
         $this->paymentRepository->updatePayment($finalPaymentDetails);
