@@ -287,25 +287,6 @@ class PaymentHelper
             $this->getLogger(__METHOD__)->error('Novalnet::assignPlentyPaymentToPlentyOrder', $e);
         }
     }
-
- 
-     public function cancelPlentyOrder(int $orderId)
-    {
-        try {
-        /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
-       $orderRepo = $this->orderRepository;
-        $authHelper = pluginApp(AuthHelper::class);
-        $authHelper->processUnguarded(
-                function () use ($orderRepo, $orderId) {
-                //unguarded
-                $orderRepo->cancel($orderId, ['message' => 'Order Canceled']);
-                
-            }
-        );
-        } catch (\Exception $e) {
-            $this->getLogger(__METHOD__)->error('Novalnet::cancelPlentyOrder', $e);
-        }
-    }
     
     /**
      * Get Novalnet status message.
@@ -610,11 +591,12 @@ class PaymentHelper
         $finalPaymentDetails->properties = $paymentProperty; 
         if ($refund_process == true) {
         
-        $finalPaymentDetails->status =  ($partial_refund == true) ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED;
+        $finalPaymentDetails->status =  ($tid_status == '103' ? Payment::STATUS_CANCELED : ($partial_refund == true ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED));
         
         }
         $this->paymentRepository->updatePayment($finalPaymentDetails);
     }
+    
     
     /**
       * Build cash payment transaction comments
@@ -696,6 +678,26 @@ class PaymentHelper
         $payment->properties = $paymentProperty;
         $paymentObj = $this->paymentRepository->createPayment($payment);
         $this->assignPlentyPaymentToPlentyOrder($paymentObj, (int)$paymentData['child_order_id']);
+    }
+    
+     /**
+     * Cancel an order in plentymarkets.
+     *
+     * @param int $orderId
+     */
+     public function cancelPlentyOrder(int $orderId)
+    {
+        try {
+        /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $authHelper->processUnguarded(
+                function () use ($orderId) {
+                    $this->orderRepository->cancel($orderId, ['message' => 'Cancel an order']);
+            }
+        );
+        } catch (\Exception $e) {
+            $this->getLogger(__METHOD__)->error('Novalnet::cancelPlentyOrder', $e);
+        }
     }
     
    public function logger ($key, $value) {
