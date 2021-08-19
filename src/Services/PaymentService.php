@@ -205,6 +205,8 @@ class PaymentService
                     $requestData['paid_amount'] = ($requestData['tid_status'] == '100') ? $requestData['amount'] : '0';
                 }
             } else {
+		$this->paymentHelper->cancelPlentyOrder($requestData['order_no']);
+		$requestData['type'] = 'cancel';
                 $requestData['paid_amount'] = '0';
             }
         
