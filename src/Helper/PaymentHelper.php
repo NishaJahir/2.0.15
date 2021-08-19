@@ -193,7 +193,7 @@ class PaymentHelper
         
         $payment->mopId           = (int) $requestData['mop'];
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status          = ($requestData['type'] == 'confirmed' ? Payment::STATUS_APPROVED : ($requestData['type'] == 'cancel' ? Payment::STATUS_CANCELED : Payment::STATUS_CAPTURED));
+        $payment->status          = (in_array($requestData['tid_status'], ['75', '85', '86', '90', '91', '98', '99']) ? Payment::STATUS_AWAITING_APPROVAL : ($requestData['type'] == 'cancel' ? Payment::STATUS_CANCELED : Payment::STATUS_CAPTURED));
         $payment->currency        = $requestData['currency'];
         $payment->amount          = $requestData['paid_amount'];
         if(isset($requestData['booking_text']) && !empty($requestData['booking_text'])) {
@@ -208,9 +208,7 @@ class PaymentHelper
             $payment->status = ($partial_refund == true )  ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED;
         }
         
-        if(!empty($requestData['unaccountable'])) {
-            $payment->unaccountable = 1;
-        }
+       
         
         $invoicePrepaymentDetails =  [
               'invoice_bankname'  => $requestData['invoice_bankname'],
