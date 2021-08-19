@@ -136,7 +136,6 @@ class PaymentController extends Controller
         if ($isPaymentSuccess) {
             $this->paymentService->pushNotification($notificationMessage, 'success', 100);
         } else {
-	    $this->paymentHelper->cancelPlentyOrder($responseData['order_no']);
             $this->paymentService->pushNotification($notificationMessage, 'error', 100);    
         }
         
