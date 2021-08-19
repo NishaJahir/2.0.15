@@ -293,6 +293,7 @@ class CallbackController extends Controller
                 $transactionStatus = $this->payment_details($nnTransactionHistory->orderNo);
                 $callbackComments = sprintf($this->paymentHelper->getTranslatedText('callback_transaction_cancellation',$orderLanguage),date('d.m.Y'), date('H:i:s'));
                 $this->paymentHelper->updatePayments($this->aryCaptureParams['tid'], $this->aryCaptureParams['tid_status'], $nnTransactionHistory->orderNo);
+	        $this->paymentHelper->cancelPlentyOrder($nnTransactionHistory->orderNo);
                 $this->sendCallbackMail($callbackComments);
            return $this->renderTemplate($callbackComments);
             }
@@ -486,7 +487,8 @@ class CallbackController extends Controller
                     // Przelewy24 cancel.
                     $callbackComments = '</br>' . sprintf($this->paymentHelper->getTranslatedText('callback_transaction_cancellation',$orderLanguage),date('d.m.Y'), date('H:i:s') ) . '</br>';
                     $this->paymentHelper->updatePayments($this->aryCaptureParams['tid'], $this->aryCaptureParams['tid_status'], $nnTransactionHistory->orderNo);
-                    $this->sendCallbackMail($callbackComments);
+                    $this->paymentHelper->cancelPlentyOrder($nnTransactionHistory->orderNo);
+		    $this->sendCallbackMail($callbackComments);
                     return $this->renderTemplate($callbackComments);
                 }
                 else
