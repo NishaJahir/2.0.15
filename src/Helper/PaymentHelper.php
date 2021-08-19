@@ -589,7 +589,7 @@ class PaymentHelper
         $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
         $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $tid_status);
         $finalPaymentDetails->properties = $paymentProperty; 
-        if ($refund_process == true) {
+        if ($refund_process == true || $tid_status == '103') {
         
         $finalPaymentDetails->status =  ($tid_status == '103' ? Payment::STATUS_CANCELED : ($partial_refund == true ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED));
         
